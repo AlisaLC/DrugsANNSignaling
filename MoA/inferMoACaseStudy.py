@@ -524,14 +524,14 @@ for i in range(numberOfModels):
         all_sources = pd.DataFrame({"sources":sources})
         all_sources["model"] = i
     else:
-        df_all = pd.concat([df_all,NetworkPandas],0).reset_index(drop=True)
+        df_all = pd.concat([df_all,NetworkPandas], axis=0).reset_index(drop=True)
         df_all_source_types = pd.concat([df_all_source_types,
-                                         df_node_types[df_node_types['type']=='source'].reset_index(drop=True)],0).reset_index(drop=True)
+                                         df_node_types[df_node_types['type']=='source'].reset_index(drop=True)], axis=0).reset_index(drop=True)
         df_all_target_types = pd.concat([df_all_target_types,
-                                         df_node_types[df_node_types['type']=='target'].reset_index(drop=True)],0).reset_index(drop=True)
+                                         df_node_types[df_node_types['type']=='target'].reset_index(drop=True)], axis=0).reset_index(drop=True)
         all_sources_tmp = pd.DataFrame({"sources":sources})
         all_sources_tmp["model"] = i
-        all_sources = pd.concat([all_sources,all_sources_tmp],0).reset_index(drop=True)
+        all_sources = pd.concat([all_sources,all_sources_tmp], axis=0).reset_index(drop=True)
     ### Save shorter network
     max_shortest_source_paths = nx.shortest_path(SignalingNet, sources[0], target)
     for source in sources:
