@@ -104,9 +104,9 @@ drugSim = torch.tensor(drugSim.values.copy(), dtype=torch.double)
 Y = torch.tensor(TFOutput.values, dtype=torch.double)
 # define threshold and load models' unmasked and masked predictions
 thresholds = list(np.logspace(-3.5, 3.5, num=50))
-thresh = args.error_threshold
-Y_ALL = torch.load(Y_ALL_path)
-Y_ALL_masked = torch.load(Y_ALL_masked_path)
+thresh = float(args.error_threshold)
+Y_ALL = torch.load(Y_ALL_path, weights_only=False)
+Y_ALL_masked = torch.load(Y_ALL_masked_path, weights_only=False)
 global_threshold_all = np.zeros((drugInput.shape[1], numberOfModels))
 
 print2log('Begin calculating thresholds for each drug')
@@ -138,7 +138,7 @@ print2log('Start inferring binary interactions with the error-based method')
 drug_ratioMatrix = torch.arange(0, 1.01, 0.01).T.repeat(drugInput.shape[1], 1).double()
 
 for i in range(numberOfModels):
-    model = torch.load(inputPath + str(i) + ".pt")
+    model = torch.load(inputPath + str(i) + ".pt", weights_only=False)
     model.eval()
     interactions = pd.read_csv(interactionsPath + 'interactionScores_%s.csv' % i, index_col=0)
     merged_interactions = inferDrugTarget(interactions, torch.tensor(global_threshold_all), model.drugLayer.mask.T.detach(), drugInput, drugTargets, i, thresh=thresh)

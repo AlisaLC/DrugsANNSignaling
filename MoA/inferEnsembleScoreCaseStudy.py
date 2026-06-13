@@ -81,7 +81,7 @@ drugSim = torch.tensor(drugSim.values.copy(), dtype=torch.double)
 X = torch.tensor(drugInput.values.copy(), dtype=torch.double)
 Y = torch.tensor(TFOutput.values, dtype=torch.double)
 
-model = torch.load(inputPath+str(0)+".pt")
+model = torch.load(inputPath+str(0)+".pt", weights_only=False)
 all_scores = np.zeros((numberOfModels,model.drugLayer.mask.T.shape[0],model.drugLayer.mask.T.shape[1]))
 mask = model.drugLayer.mask.T
 ### Define gradient thresholds
@@ -91,7 +91,7 @@ Y_ALL_masked = torch.zeros(numberOfModels,len(thresholds),Y.shape[0],Y.shape[1])
 models_times = []
 for i in range(numberOfModels):
     prev_time = time.time()
-    model = torch.load(inputPath + str(i) + ".pt")
+    model = torch.load(inputPath + str(i) + ".pt", weights_only=False)
     model.eval()
     Yhat, YhatFull = model(X)
     Y_ALL[i, :, :] = Yhat.detach()

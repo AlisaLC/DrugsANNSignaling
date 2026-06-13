@@ -28,7 +28,7 @@ args = parser.parse_args()
 ConvertToEmpProb = args.ConvertToEmpProb
 if type(ConvertToEmpProb) == str :
     ConvertToEmpProb = eval(ConvertToEmpProb)
-no_models = args.numberOfModels
+no_models = int(args.numberOfModels)
 ensembles_path = args.ensembles_path
 inputPattern = args.inputPattern
 inputPath = ensembles_path + inputPattern
@@ -108,7 +108,7 @@ Y = torch.tensor(TFOutput.values, dtype=torch.double)
     
 for i in range(no_models):
     # Here we load the pre-trained drug layer, which was trained on cell-line data
-    model = torch.load(inputPath+str(i)+".pt")
+    model = torch.load(inputPath+str(i)+".pt", weights_only=False)
     model.eval()
 
     Yhat, YhatFull = model(X)

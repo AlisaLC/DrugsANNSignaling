@@ -165,7 +165,7 @@ drug_ratioMatrix = torch.arange(0, 1.01, 0.01)
 drug_ratioMatrix = drug_ratioMatrix.T.repeat(drugInput.shape[0],drugInput.shape[1],1)
 drug_ratioMatrix = drug_ratioMatrix.double()
 for i in range(numberOfModels):#range(1):
-    model = torch.load(inputPath+str(i)+".pt")
+    model = torch.load(inputPath+str(i)+".pt", weights_only=False)
     resetGradients(model)
     model.eval()
     X = torch.tensor(drugInput.values.copy(), dtype=torch.double)

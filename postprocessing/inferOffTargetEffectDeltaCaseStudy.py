@@ -90,7 +90,7 @@ Y_ALL_masked_2 = torch.zeros(numberOfModels,Y.shape[0],Y.shape[1])
 model_times = []
 for i in range(numberOfModels):
     prev_time = time.time()
-    model = torch.load(inputPathPattern+str(i)+".pt")
+    model = torch.load(inputPathPattern+str(i)+".pt", weights_only=False)
     model.eval()
     Yhat, YhatFull = model(X)
     Y_ALL[i,:,:] = Yhat.detach()

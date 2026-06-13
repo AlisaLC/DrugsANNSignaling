@@ -112,8 +112,8 @@ parser.add_argument('--sample', action='store',default='CPC014_A375_6H:BRD-K2319
 
 args = parser.parse_args()
 numberOfModels = int(args.numberOfModels)
-source_freq_thresh = args.source_freq_thresh
-edge_thresh_init = args.edge_thresh_init
+source_freq_thresh = float(args.source_freq_thresh)
+edge_thresh_init = float(args.edge_thresh_init)
 ConvertToEmpProb = args.ConvertToEmpProb
 if type(ConvertToEmpProb) == str :
     ConvertToEmpProb = eval(ConvertToEmpProb)
@@ -230,7 +230,7 @@ mean_bias = np.zeros((len(nodeNames)))
 models_times = []
 for i in range(numberOfModels):
     prev_time = time.time()
-    model = torch.load(inputPath+str(i)+".pt")
+    model = torch.load(inputPath+str(i)+".pt", weights_only=False)
     resetGradients(model)
     model.eval()
     mean_bias = mean_bias + model.network.bias.detach().numpy().squeeze()
@@ -704,13 +704,13 @@ else:
             subnet = EnsembledNet_larger.subgraph(p)
             subnet_df = nx.to_pandas_edgelist(subnet)
             subnet_df['path'] = p_ind
-            all_paths_df = all_paths_df.append(subnet_df)
+            all_paths_df = pd.concat([all_paths_df, subnet_df])
             p_ind +=1
     all_paths_df = all_paths_df.merge(ensembled,on=['source','target','weight'],how='left')
     avg_paths = all_paths_df.groupby(['path']).agg(avg_counts = pd.NamedAgg(column ='model_counts', aggfunc=np.mean))
     final_path = avg_paths.index[np.argmax(avg_paths.avg_counts.values)]
     final_path_df = all_paths_df[all_paths_df['path']==final_path].loc[:,ensembled_tmp.columns.values]
-    ensembled_tmp = ensembled_tmp.append(final_path_df)
+    ensembled_tmp = pd.concat([ensembled_tmp, final_path_df])
     ensembled_tmp = ensembled_tmp.drop_duplicates() 
     EnsembledNet = nx.from_pandas_edgelist(ensembled_tmp,source='source', target='target', edge_attr='weight', create_using=nx.DiGraph())
     G_tmp = EnsembledNet.copy()
@@ -803,7 +803,7 @@ for source in  all_sources_counted.sources:
     shortest_path = nx.shortest_path(SignalingNet, source, target)
     shortNet = SignalingNet.subgraph(shortest_path)
     subnet_df = nx.to_pandas_edgelist(shortNet)
-    NetworkPandas_short = NetworkPandas_short.append(subnet_df)
+    NetworkPandas_short = pd.concat([NetworkPandas_short, subnet_df])
 NetworkPandas_short = NetworkPandas_short.merge(df_map.rename({'id': 'source'}, axis=1), on='source', how='left')
 NetworkPandas_short = NetworkPandas_short.rename({'name': 'name_source'}, axis=1)
 NetworkPandas_short = NetworkPandas_short.merge(df_map.rename({'id': 'target'}, axis=1), on='target', how='left')
@@ -826,7 +826,7 @@ for s in all_sources_counted.sources:
         subnet = SignalingNet.subgraph(p)
         subnet_df = nx.to_pandas_edgelist(subnet)
         subnet_df['path'] = p_ind
-        NetworkPandas_frequent = NetworkPandas_frequent.append(subnet_df)
+        NetworkPandas_frequent = pd.concat([NetworkPandas_frequent, subnet_df])
         p_ind +=1
 NetworkPandas_frequent = NetworkPandas_frequent.merge(ensembled,on=['source','target','weight'],how='left')
 avg_paths = NetworkPandas_frequent.groupby(['path']).agg(avg_counts = pd.NamedAgg(column ='model_counts', aggfunc=np.mean))
